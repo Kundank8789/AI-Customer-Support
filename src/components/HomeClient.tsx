@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
+import axios from "axios"
+import { useRouter } from "next/navigation"
 
 function HomeClient({ email }: { email: string }) {
   const handleLogin = () => {
@@ -20,6 +22,33 @@ function HomeClient({ email }: { email: string }) {
     document.addEventListener("mousedown", handler)
     return () => document.removeEventListener("mousedown", handler)
   }, [])
+
+  const navigate=useRouter()
+
+  const feature = [
+    {
+      title: "Plug and Play",
+      description: "Easily integrate our AI chatbot into your website with just a few clicks. No coding required."
+    },
+    {
+      title: "24/7 Customer Support",
+      description: "Provide instant answers to your customers' questions, anytime, anywhere. Our AI chatbot is always available to assist."
+    },
+    {
+      title: "Customizable Responses",
+      description: "Tailor the chatbot's responses to match your brand's voice and style. Create a personalized experience for your customers."
+    }
+  ]
+
+  const handleLogout = async () => {
+    try {
+      const result = await axios.get("/api/auth/logout")
+      window.location.href = "/"
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-linear-to-br from-white to-zinc-50 text-zinc-900 overflow-x-hidden">
       <motion.div
@@ -50,10 +79,10 @@ function HomeClient({ email }: { email: string }) {
                     exit={{ opacity: 0, y: -6 }}
                     className="absolute right-0 mt-3 w-44 bg-white rounded-xl shadow-xl border border-zinc-200 overflow-hidden"
                   >
-                    <button className="w-full text-left px-4 py-3 text-sm hover:bg-zinc-100">
+                    <button className="w-full text-left px-4 py-3 text-sm hover:bg-zinc-100" onClick={()=>navigate.push("/dashboard")}>
                       Dashboard
                     </button>
-                    <button className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-zinc-100">
+                    <button className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-zinc-100" onClick={handleLogout}>
                       Logout
                     </button>
                   </motion.div>
@@ -85,9 +114,9 @@ function HomeClient({ email }: { email: string }) {
             </p>
             <div className="mt-10 flex gap-4">
 
-              {email ? <button className="px-7 py-3 rounded-xl bg-black text-white font-medium hover:bg-zinc-800 transition disabled:opacity-60">Go to Dashboard</button> : <button className="px-7 py-3 rounded-xl bg-black text-white font-medium hover:bg-zinc-800 transition disabled:opacity-60" onClick={handleLogin}>Get Started</button>}
+              {email ? <button className="px-7 py-3 rounded-xl bg-black text-white font-medium hover:bg-zinc-800 transition disabled:opacity-60" onClick={()=>navigate.push("/dashboard")}>Go to Dashboard</button> : <button className="px-7 py-3 rounded-xl bg-black text-white font-medium hover:bg-zinc-800 transition disabled:opacity-60" onClick={handleLogin}>Get Started</button>}
 
-              <button className="px-7 py-3 rounded-xl border border-zinc-300 text-zinc-700 hover:bg-zinc-100 transition">Learn More</button>
+              <a href="#feature" className="px-7 py-3 rounded-xl border border-zinc-300 text-zinc-700 hover:bg-zinc-100 transition">Learn More</a>
             </div>
 
           </motion.div>
@@ -102,15 +131,52 @@ function HomeClient({ email }: { email: string }) {
               <div className="space-y-3">
                 <div className="bg-black text-white rounded-lg px-4 py-2 text-sm ml-auto w-fit">Do you offer cash on delivery?</div>
                 <div className="bg-zinc-100 rounded-lg px-4 py-2 text-sm w-fit">yes, we offer cash on delivery</div>
-                
+
               </div>
-               <motion.div>🗨️</motion.div>
+              <motion.div
+                animate={{ y: [0, -12, 0] }}
+                transition={{ repeat: Infinity, duration: 3 }}
+                className="absolute -bottom-6 -right-6 w-14 h-14 rounded-full bg-black text-white flex items-center justify-center shadow-xl"
+              >🗨️</motion.div>
             </div>
-           
+
           </motion.div>
         </div>
       </section>
-
+      <section
+        id="feature"
+        className="bg-zinc-50 py-28 px-6 border-t border-zinc-200"
+      >
+        <div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl font-semibold text-center"
+          >
+            Why Bussiness choose SupportAI
+          </motion.h2>
+          <div className="mt-16 grid grid-col-1 md:grid-cols-3 gap-10">
+            {feature.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: false }}
+                className="bg-white rounded-2xl p-8 shadow-lg border border-zinc-200"
+              >
+                <h1 className="text-lg font-medium">{feature.title}</h1>
+                <p className="mt-3 text-zinc-600 text-sm">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+      <footer className="py-10 text-center text-sm text-zinc-500">
+        &copy; {new Date().getFullYear()} SupportAI. All rights reserved.
+      </footer>
     </div>
   )
 }
