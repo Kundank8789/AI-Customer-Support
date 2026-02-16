@@ -15,15 +15,15 @@ const settingsSchema = new Schema<ISettings>({
     },
     businessName: {
         type: String,
-        required: true,
+        default: ""
     },
     supportEmail: {
         type: String,
-        required: true,
+        default: ""
     },
     knowledge: {
         type: String,
-        required: true,
+        default: ""
     },
 }, { timestamps: true })
 
