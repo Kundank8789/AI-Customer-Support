@@ -1,14 +1,14 @@
 import mongoose,  {model, Schema } from "mongoose";
 
 interface ISettings {
-    OwnerId: string;
+    ownerId: string;
     businessName: string;
     supportEmail: string;
-    Knowledge: string;
+    knowledge: string;
 }
 
 const settingsSchema = new Schema<ISettings>({
-    OwnerId: {
+    ownerId: {
         type: String,
         required: true,
         unique: true,
@@ -21,7 +21,7 @@ const settingsSchema = new Schema<ISettings>({
         type: String,
         required: true,
     },
-    Knowledge: {
+    knowledge: {
         type: String,
         required: true,
     },
