@@ -59,6 +59,8 @@ function EmbedClient({ ownerId }: { ownerId: string }) {
               <span className='w-2.5 h-2.5 rounded-full bg-green-400' />
               <span className='ml-auto text-xs text-zinc-500'>Your-Website.com</span>
             </div>
+
+            <div className='relative h-64 sm:h-72 p-6'>Your Website goes here</div>
           </div>
         </motion.div>
       </div>
