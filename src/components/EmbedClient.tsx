@@ -40,6 +40,26 @@ function EmbedClient({ ownerId }: { ownerId: string }) {
               {copied ? "Copied ✓" : "Copy"}
             </button>
           </div>
+
+          <ol className='space-y-3 text-sm text-zinc-600 list-decimal list-inside'>
+            <li>Copy embed script</li>
+            <li>Paste it before the closing body tag</li>
+            <li>Reload your website</li>
+          </ol>
+
+          <div className='mt-14'>
+            <h1 className='text-lg font-medium mb-2'>Live Preview</h1>
+            <p className='text-sm text-zinc-500 mb-6'>After embedding, you should see the chatbot appear on your website.</p>
+          </div>
+
+          <div className='rounded-xl border border-zinc-300 bg-white shadow-md overflow-hidden'>
+            <div className='flex items-center gap-2 px-4 h-9 bg-zinc-100 border-b border-zinc-200'>
+              <span className='w-2.5 h-2.5 rounded-full bg-red-400' />
+              <span className='w-2.5 h-2.5 rounded-full bg-yellow-400' />
+              <span className='w-2.5 h-2.5 rounded-full bg-green-400' />
+              <span className='ml-auto text-xs text-zinc-500'>Your-Website.com</span>
+            </div>
+          </div>
         </motion.div>
       </div>
 
