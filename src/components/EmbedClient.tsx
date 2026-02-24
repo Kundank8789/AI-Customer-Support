@@ -60,7 +60,26 @@ function EmbedClient({ ownerId }: { ownerId: string }) {
               <span className='ml-auto text-xs text-zinc-500'>Your-Website.com</span>
             </div>
 
-            <div className='relative h-64 sm:h-72 p-6'>Your Website goes here</div>
+            <div className='relative h-64 sm:h-72 p-6'>Your Website goes here.
+
+              <div className='absolute bottom-24 right-6 w-64 bg-white rounded-xl shadow-xl border border-zinc-200 overflow-hidden'>
+                <div className='bg-black text-white text-xs px-3 py-2 flex justify-between items-center'>
+                  <span>Customer Support </span>
+                  <span>✕</span>
+                </div>
+                <div className='p-3 space-y-2 bg-zinc-50'>
+                  <div className='bg-zinc-200 text-zinc-800 text-xs px-3 py-2 rounded-lg w-fit'>hi! how can i help you?</div>
+                  <div className='bg-black text-white text-xs px-3 py-2 rounded-lg ml-auto w-fit'>what is the return policy?</div>
+                </div>
+              </div>
+
+              <motion.div
+                animate={{ y: [0, -8, 0] }}
+                transition={{ repeat: Infinity, duration: 3 }}
+                className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-black text-white flex items-center justify-center shadow-2xl cursor-pointer">
+                🗨️
+              </motion.div>
+            </div>
           </div>
         </motion.div>
       </div>
