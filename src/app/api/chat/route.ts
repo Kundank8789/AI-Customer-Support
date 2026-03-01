@@ -5,25 +5,66 @@ import connectDb from "@/src/lib/db";
 
 export async function POST(req: NextRequest) {
     try {
-        const { message, ownerId } = await req.json()
+        const { message, ownerId } = await req.json();
+
         if (!message || !ownerId) {
             return NextResponse.json(
                 { message: "Missing fields" },
                 { status: 400 }
-            )
+            );
         }
-        await connectDb()
-        const setting = await Settings.findOne({ ownerId })
+
+        await connectDb();
+
+        const setting = await Settings.findOne({ ownerId });
+
         if (!setting) {
             return NextResponse.json(
-                { message: "chat bot is not configured yet." },
+                { message: "Chat bot is not configured yet." },
                 { status: 404 }
-            )
+            );
         }
+
+        // ===============================
+        // ✅ PLAN LIMIT CHECK
+        // ===============================
+
+        const limits: Record<string, number> = {
+            free: 100,
+            pro: 2000,
+            enterprise: Infinity,
+        };
+
+        const limit = limits[setting.plan || "free"];
+
+        // Atomic update to prevent race condition
+        const updatedSetting = await Settings.findOneAndUpdate(
+            {
+                ownerId: ownerId,
+                messagesUsed: { $lt: limit },
+            },
+            { $inc: { messagesUsed: 1 } },
+            { new: true }
+        );
+
+        if (!updatedSetting) {
+            return NextResponse.json(
+                {
+                    error: "Message limit reached. Please upgrade your plan at /pricing",
+                },
+                { status: 403 }
+            );
+        }
+
+        // ===============================
+        // ✅ AI PROMPT
+        // ===============================
+
         const KNOWLEDGE = `business name- ${setting.businessName || "not provided"} 
-        support email- ${setting.supportEmail || "not provided"}
-        knowledge- ${setting.knowledge || "not provided"} `
-        const promt = ` You are a professional customer support assistant for this business.
+support email- ${setting.supportEmail || "not provided"}
+knowledge- ${setting.knowledge || "not provided"}`;
+
+        const prompt = `You are a professional customer support assistant for this business.
 
 Use ONLY the information provided below to answer the customer's question.
 You may rephrase, summarize, or interpret the information if needed.
@@ -47,26 +88,33 @@ ${message}
 ANSWER
 --------------------`;
 
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-        const res = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: promt,
+        const ai = new GoogleGenAI({
+            apiKey: process.env.GEMINI_API_KEY!,
         });
-        const response = NextResponse.json(res.text)
-        response.headers.set("Access-Control-Allow-Origin", "*")
-        response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS")
-        response.headers.set("Access-Control-Allow-Headers", "Content-Type")
+
+        const result = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt,
+        });
+
+        const response = NextResponse.json(result.text);
+
+        response.headers.set("Access-Control-Allow-Origin", "*");
+        response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+        response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+
         return response;
     } catch (error) {
         const response = NextResponse.json(
             { message: `Chat error: ${error}` },
             { status: 500 }
-        )
-        response.headers.set("Access-Control-Allow-Origin", "*")
-        response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS")
-        response.headers.set("Access-Control-Allow-Headers", "Content-Type")
-        return response;
+        );
 
+        response.headers.set("Access-Control-Allow-Origin", "*");
+        response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+        response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+
+        return response;
     }
 }
 
@@ -77,7 +125,6 @@ export const OPTIONS = async () => {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "POST, OPTIONS",
             "Access-Control-Allow-Headers": "Content-Type",
-        }
-
-    })
-}
+        },
+    });
+};
